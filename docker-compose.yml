@@ -23,7 +23,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - "./database/task_app_ddl.sql:/docker-entrypoint-initdb.d/1.sql"
     networks:
