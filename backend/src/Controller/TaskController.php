@@ -2,74 +2,149 @@
 
 namespace App\Controller;
 
+use App\DTO\TaskDTO;
+use App\DTO\DeleteTaskDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Task;
-use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TaskController extends AbstractController
 {
-    #[Route('/api/tasks', 'get_tasks', ['GET'])]
+    private $entityManager;
+    private $validator;
+
+    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator)
+    {
+        $this->entityManager = $entityManager;
+        $this->validator = $validator;
+    }
+
+    /**
+     * @Route("/api/tasks", name="get_tasks", methods={"GET"})
+     */
     public function getTasks(): JsonResponse
     {
         $user = $this->getUser();
-        $tasks = $this->getDoctrine()->getRepository(Task::class)->findBy(['user' => $user]);
+        $tasks = $this->entityManager->getRepository(Task::class)->findBy(['user' => $user]);
 
-        return new JsonResponse($tasks);
+        $taskArray = array_map(function (Task $task) {
+            return [
+                'id' => $task->getId(),
+                'title' => $task->getTitle(),
+                'description' => $task->getDescription(),
+                'created_at' => $task->getCreatedAt()->format(\DateTime::ISO8601),
+                'updated_at' => $task->getUpdatedAt()->format(\DateTime::ISO8601),
+            ];
+        }, $tasks);
+
+        return new JsonResponse($taskArray);
     }
 
-    #[Route('/api/tasks', 'create_task', ['POST'])]
+    /**
+     * @Route("/api/tasks", name="create_task", methods={"POST"})
+     */
     public function createTask(Request $request): JsonResponse
     {
-        $user = $this->getUser();
         $data = json_decode($request->getContent(), true);
+        $taskDTO = new TaskDTO($data['title'], $data['description']);
+
+        // Validação
+        $errors = $this->validator->validate($taskDTO);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
+        }
 
         $task = new Task();
-        $task->setUser($user);
-        $task->setTitle($data['title']);
-        $task->setDescription($data['description']);
+        $task->setUser($this->getUser());
+        $task->setTitle($taskDTO->getTitle());
+        $task->setDescription($taskDTO->getDescription());
+        $task->setCreatedAt(new \DateTime());
+        $task->setUpdatedAt(new \DateTime()); // Atualiza a data de modificação
 
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($task);
-        $em->flush();
+        try {
+            $this->entityManager->persist($task);
+            $this->entityManager->flush();
 
-        return new JsonResponse($task, 201);
+            return new JsonResponse(['status' => 'Task created successfully', 'task' => $task->getId()], 201);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Failed to create task', 'message' => $e->getMessage()], 500);
+        }
     }
 
-    #[Route('/api/tasks/{id}', 'update_task', ['PUT'])]
+    /**
+     * @Route("/api/tasks/{id}", name="update_task", methods={"PUT"})
+     */
     public function updateTask($id, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $task = $this->getDoctrine()->getRepository(Task::class)->find($id);
+        $taskDTO = new TaskDTO($data['title'], $data['description']);
+
+        $errors = $this->validator->validate($taskDTO);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $task = $this->entityManager->getRepository(Task::class)->find($id);
 
         if (!$task || $task->getUser() !== $this->getUser()) {
             return new JsonResponse(['error' => 'Task not found or not authorized'], 404);
         }
 
-        $task->setTitle($data['title']);
-        $task->setDescription($data['description']);
+        $task->setTitle($taskDTO->getTitle());
+        $task->setDescription($taskDTO->getDescription());
+        $task->setUpdatedAt(new \DateTime());
 
-        $em = $this->getDoctrine()->getManager();
-        $em->flush();
+        try {
+            $this->entityManager->persist($task);
+            $this->entityManager->flush();
 
-        return new JsonResponse($task);
+            return new JsonResponse(['status' => 'Task updated successfully', 'task' => $task->getId()], 200);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Failed to update task', 'message' => $e->getMessage()], 500);
+        }
     }
 
-    #[Route('/api/tasks/{id}', 'delete_task', ['DELETE'])]
+    /**
+     * @Route("/api/tasks/{id}", name="delete_task", methods={"DELETE"})
+     */
     public function deleteTask($id): JsonResponse
     {
-        $task = $this->getDoctrine()->getRepository(Task::class)->find($id);
+        // Valida o ID da tarefa
+        $deleteTaskDTO = new DeleteTaskDTO($id);
+        $errors = $this->validator->validate($deleteTaskDTO);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $task = $this->entityManager->getRepository(Task::class)->find($id);
 
         if (!$task || $task->getUser() !== $this->getUser()) {
             return new JsonResponse(['error' => 'Task not found or not authorized'], 404);
         }
 
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($task);
-        $em->flush();
+        try {
+            $this->entityManager->remove($task);
+            $this->entityManager->flush();
 
-        return new JsonResponse(null, 204);
+            return new JsonResponse(['status' => 'Task deleted successfully', 'task' => $task->getId()], 200);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Failed to delete task', 'message' => $e->getMessage()], 500);
+        }
     }
 }

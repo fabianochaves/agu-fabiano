@@ -1,5 +1,5 @@
 security:
-  encoders:
+  password_hashers:
     App\Entity\User:
       algorithm: auto
 
@@ -17,21 +17,26 @@ security:
     login:
       pattern:  ^/api/login
       stateless: true
-      anonymous: true
+      security: false
       json_login:
         check_path:               /api/login
         username_path:            username
         password_path:            password
         success_handler:          lexik_jwt_authentication.handler.authentication_success
         failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+    
+    register:
+      pattern:  ^/api/register
+      stateless: true
+      security: false
 
     api:
       pattern:   ^/api
       stateless: true
-      guard:
-        authenticators:
-          - lexik_jwt_authentication.jwt_token_authenticator
+      jwt: ~
+      provider: app_user_provider
 
   access_control:
     - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/api/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
     - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
