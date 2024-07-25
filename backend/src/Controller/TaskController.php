@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\TaskDTO;
 use App\DTO\DeleteTaskDTO;
+use App\Service\TaskService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,15 +12,18 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Task;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class TaskController extends AbstractController
 {
     private $entityManager;
+    private $taskService;
     private $validator;
 
-    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator)
+    public function __construct(EntityManagerInterface $entityManager, TaskService $taskService, ValidatorInterface $validator)
     {
         $this->entityManager = $entityManager;
+        $this->taskService = $taskService;
         $this->validator = $validator;
     }
 
@@ -52,7 +56,6 @@ class TaskController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $taskDTO = new TaskDTO($data['title'], $data['description']);
 
-        // Validação
         $errors = $this->validator->validate($taskDTO);
         if (count($errors) > 0) {
             $errorMessages = [];
@@ -62,20 +65,11 @@ class TaskController extends AbstractController
             return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $task = new Task();
-        $task->setUser($this->getUser());
-        $task->setTitle($taskDTO->getTitle());
-        $task->setDescription($taskDTO->getDescription());
-        $task->setCreatedAt(new \DateTime());
-        $task->setUpdatedAt(new \DateTime()); // Atualiza a data de modificação
-
         try {
-            $this->entityManager->persist($task);
-            $this->entityManager->flush();
-
-            return new JsonResponse(['status' => 'Task created successfully', 'task' => $task->getId()], 201);
+            $task = $this->taskService->createTask($taskDTO, $this->getUser());
+            return new JsonResponse(['message' => 'Task created successfully', 'task' => $task->getId()], Response::HTTP_CREATED);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Failed to create task', 'message' => $e->getMessage()], 500);
+            return new JsonResponse(['error' => 'Failed to create task: ' . $e->getMessage()], Response::HTTP_CONFLICT);
         }
     }
 
@@ -96,24 +90,18 @@ class TaskController extends AbstractController
             return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $task = $this->entityManager->getRepository(Task::class)->find($id);
-
-        if (!$task || $task->getUser() !== $this->getUser()) {
-            return new JsonResponse(['error' => 'Task not found or not authorized'], 404);
-        }
-
-        $task->setTitle($taskDTO->getTitle());
-        $task->setDescription($taskDTO->getDescription());
-        $task->setUpdatedAt(new \DateTime());
-
         try {
-            $this->entityManager->persist($task);
-            $this->entityManager->flush();
-
-            return new JsonResponse(['status' => 'Task updated successfully', 'task' => $task->getId()], 200);
+            $task = $this->taskService->updateTask($id, $taskDTO, $this->getUser());
+    
+            if (!$task) {
+                return new JsonResponse(['error' => 'Task could not be updated'], Response::HTTP_CONFLICT);
+            }
+    
+            return new JsonResponse(['message' => 'Task updated successfully', 'task' => $task->getId()], Response::HTTP_OK);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Failed to update task', 'message' => $e->getMessage()], 500);
+            return new JsonResponse(['error' => 'Failed to update task: ' . $e->getMessage()], Response::HTTP_CONFLICT);
         }
+
     }
 
     /**
@@ -121,7 +109,7 @@ class TaskController extends AbstractController
      */
     public function deleteTask($id): JsonResponse
     {
-        // Valida o ID da tarefa
+
         $deleteTaskDTO = new DeleteTaskDTO($id);
         $errors = $this->validator->validate($deleteTaskDTO);
         if (count($errors) > 0) {
@@ -132,19 +120,17 @@ class TaskController extends AbstractController
             return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $task = $this->entityManager->getRepository(Task::class)->find($id);
-
-        if (!$task || $task->getUser() !== $this->getUser()) {
-            return new JsonResponse(['error' => 'Task not found or not authorized'], 404);
-        }
 
         try {
-            $this->entityManager->remove($task);
-            $this->entityManager->flush();
-
-            return new JsonResponse(['status' => 'Task deleted successfully', 'task' => $task->getId()], 200);
+            $task = $this->taskService->deleteTask($deleteTaskDTO, $this->getUser());
+    
+            if (!$task) {
+                return new JsonResponse(['error' => 'Task could not be deleted'], Response::HTTP_CONFLICT);
+            }
+    
+            return new JsonResponse(['message' => 'Task deleted successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Failed to delete task', 'message' => $e->getMessage()], 500);
+            return new JsonResponse(['error' => 'Failed to delete task: ' . $e->getMessage()], Response::HTTP_CONFLICT);
         }
     }
 }

@@ -40,8 +40,12 @@ class TaskService
     {
         $task = $this->entityManager->getRepository(Task::class)->find($id);
 
-        if (!$task || $task->getUser() !== $user) {
-            return null;
+        if (!$task) {
+            throw new \Exception('Task not found');
+        }
+
+        if ($task->getUser() !== $user) {
+            throw new \Exception('You do not have permission to update this task');
         }
 
         $task->setTitle($taskDTO->getTitle());
