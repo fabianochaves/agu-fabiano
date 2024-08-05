@@ -19,6 +19,10 @@ export class TaskService {
   }
 
   addTask(title: string, description: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/tasks`, { title, description });
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.post<any>(`${this.apiUrl}/tasks`, { title, description }, { headers });
   }
 }

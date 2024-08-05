@@ -39,7 +39,6 @@ export class LoginComponent {
     this.store.select(selectAuthToken).subscribe(token => {
       if (token) {
         this.isLoading = false;
-        console.log("Quase rota" + token)
         this.router.navigate(['/tasks']);
       }
     });
