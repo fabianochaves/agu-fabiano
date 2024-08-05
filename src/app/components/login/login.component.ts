@@ -1,33 +1,51 @@
 import { Component } from '@angular/core';
-import {FormsModule} from "@angular/forms";
-import {AuthService} from "../../services/auth.service";
-import {Router} from "@angular/router";
+import { CommonModule } from '@angular/common';
+import { Store } from '@ngrx/store';
+import { Observable, timer } from 'rxjs';
+import { login } from '../../store/auth/auth.actions';
+import { selectAuthError, selectAuthToken } from '../../store/auth/auth.selectors';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    FormsModule
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   username: string = '';
   password: string = '';
+  error$: Observable<string | null>;
+  showError: boolean = false;
+  isLoading: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
-
-  login() {
-    this.authService.login(this.username, this.password).subscribe({
-      next: (response: any) => {
-        const token = response.token;
-        this.authService.storeToken(token);
-        this.router.navigate(['/tasks']);
-      },
-      error: (err) => {
-        console.error('Erro ao fazer login:', err);
+  constructor(private store: Store, private router: Router) {
+    this.error$ = this.store.select(selectAuthError);
+    this.error$.subscribe(error => {
+      if (error) {
+        this.showError = true;
+        this.isLoading = false;
+        timer(5000).subscribe(() => this.showError = false);
       }
     });
+  }
+
+  login() {
+    this.isLoading = true;
+    this.store.dispatch(login({ username: this.username, password: this.password }));
+
+    this.store.select(selectAuthToken).subscribe(token => {
+      if (token) {
+        this.isLoading = false;
+        console.log("Quase rota" + token)
+        this.router.navigate(['/tasks']);
+      }
+    });
+  }
+
+  clearError() {
+    this.showError = false;
   }
 }
