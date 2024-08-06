@@ -17,10 +17,10 @@ export class TaskComponent {
 
   constructor(private taskService: TaskService) {}
 
-  addTask() {
-    this.taskService.addTask(this.title, this.description).subscribe(() => {
-      this.title = '';
-      this.description = '';
-    });
-  }
+  // addTask() {
+  //   this.taskService.addTask(this.title, this.description).subscribe(() => {
+  //     this.title = '';
+  //     this.description = '';
+  //   });
+  // }
 }

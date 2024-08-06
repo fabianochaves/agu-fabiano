@@ -18,11 +18,12 @@ export class TaskService {
     return this.http.get<any[]>(`${this.apiUrl}/tasks`, { headers });
   }
 
-  addTask(title: string, description: string): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+  addTask(taskData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/tasks`, taskData, {
+      headers: new HttpHeaders({
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      })
     });
-    return this.http.post<any>(`${this.apiUrl}/tasks`, { title, description }, { headers });
   }
 }

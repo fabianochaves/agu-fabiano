@@ -19,12 +19,18 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/register`, { username, password });
   }
 
-  storeToken(token: string): void {
+  storeSession(token: string, userId: number): void {
     localStorage.setItem('token', token);
+    localStorage.setItem('userId', userId.toString());
   }
 
   getToken(): string {
     return localStorage.getItem('token') || '';
+  }
+
+  getUserId(): number {
+    const userId = localStorage.getItem('userId');
+    return userId ? +userId : 0;
   }
 
   getAuthHeaders(): HttpHeaders {
@@ -36,6 +42,7 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('userId');
     this.router.navigate(['/login']);
   }
 

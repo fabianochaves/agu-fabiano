@@ -1,5 +1,5 @@
 <nav *ngIf="isAuthenticated$ | async">
   <a routerLink="/tasks">Tasks</a>
-  <a routerLink="/task">Add Task</a>
+  <a (click)="openAddTaskModal()">Add Task</a>
   <a (click)="logout()">Logout</a>
 </nav>
