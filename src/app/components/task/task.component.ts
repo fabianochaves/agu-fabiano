@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
-import {TaskService} from "../../services/task.service";
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import Swal from 'sweetalert2';
+import { TaskState } from '../../store/tasks/task.reducer';
+import { deleteTask } from '../../store/tasks/task.actions';
 import {FormsModule} from "@angular/forms";
 
 @Component({
@@ -9,18 +13,18 @@ import {FormsModule} from "@angular/forms";
     FormsModule
   ],
   templateUrl: './task.component.html',
-  styleUrl: './task.component.scss'
+  styleUrls: ['./task.component.scss']
 })
 export class TaskComponent {
-  title: string = '';
-  description: string = '';
+  tasks$: Observable<any[]>; // Substitua `any` pelo tipo real das suas tarefas
+  loading$: Observable<boolean>;
+  error$: Observable<string | null>;
 
-  constructor(private taskService: TaskService) {}
-
-  // addTask() {
-  //   this.taskService.addTask(this.title, this.description).subscribe(() => {
-  //     this.title = '';
-  //     this.description = '';
-  //   });
-  // }
+  constructor(private store: Store<TaskState>) {
+    // Seleciona os estados do NgRx store
+    this.tasks$ = this.store.select(state => state.tasks);
+    this.loading$ = this.store.select(state => state.loading);
+    this.error$ = this.store.select(state => state.error);
+  }
+  
 }

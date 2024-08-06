@@ -1,5 +1,5 @@
 import { createReducer, on, Action } from '@ngrx/store';
-import { loadTasks, loadTasksSuccess, loadTasksFailure, addTask, addTaskSuccess, addTaskFailure } from './task.actions';
+import { loadTasks, loadTasksSuccess, loadTasksFailure, addTask, addTaskSuccess, addTaskFailure, deleteTask, deleteTaskSuccess, deleteTaskFailure } from './task.actions';
 
 export interface TaskState {
   tasks: any[];
@@ -26,7 +26,22 @@ const _taskReducer = createReducer(
     loading: false, 
     tasks: [...state.tasks, task] // Adiciona a nova tarefa à lista de tarefas
   })),
-  on(addTaskFailure, (state, { error }) => ({ ...state, loading: false, error }))
+  on(addTaskFailure, (state, { error }) => ({ ...state, loading: false, error })),
+  on(deleteTask, state => ({
+    ...state,
+    loading: true
+  })),
+  on(deleteTaskSuccess, (state, { id }) => ({
+    ...state,
+    tasks: state.tasks.filter(task => task.id !== id),
+    loading: false,
+    error: null
+  })),
+  on(deleteTaskFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error: error
+  }))
 );
 
 export function taskReducer(state: TaskState | undefined, action: Action) {

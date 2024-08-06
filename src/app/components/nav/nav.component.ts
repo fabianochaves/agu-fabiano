@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 import { selectAuthToken } from '../../store/auth/auth.selectors';
 import { logout } from '../../store/auth/auth.actions';
 import Swal from 'sweetalert2';
@@ -36,6 +36,8 @@ export class NavComponent implements OnInit {
   }
 
   openAddTaskModal() {
+    
+    let taskAdded = false;
     Swal.fire({
       title: 'Add Task',
       html: `
@@ -78,7 +80,7 @@ export class NavComponent implements OnInit {
         this.ngRxStore.select(selectTasksLoading).pipe(
           switchMap(loading => {
             if (!loading) {
-              return this.ngRxStore.select(selectTasksError);
+              return this.ngRxStore.select(selectTasksError).pipe(take(1)); // Subscrição única
             }
             return [];
           })
@@ -87,13 +89,20 @@ export class NavComponent implements OnInit {
           if (error) {
             Swal.fire('Error', 'Failed to add task', 'error');
           } else {
-            //this.store.dispatch(loadTasks());
-            Swal.fire('Success', 'Task added successfully!', 'success').then(() => {});
+
+            if (!taskAdded) {
+              taskAdded = true;
+              Swal.fire('Success', 'Task added successfully!', 'success').then(() => {
+                this.ngRxStore.dispatch(loadTasks());
+              });
+            }
+            
           }
         });
       }
     });
   }
+  
   
   
   logout() {
