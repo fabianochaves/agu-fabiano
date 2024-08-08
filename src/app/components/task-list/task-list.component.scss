@@ -85,3 +85,11 @@ table {
   .spacer {
     margin-bottom: 20px; /* Espaço extra entre o botão e a tabela */
   }
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 10vh;
+}
+

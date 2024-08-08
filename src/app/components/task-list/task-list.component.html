@@ -1,4 +1,6 @@
-<div *ngIf="loading$ | async">Loading...</div>
+<div *ngIf="loading$ | async" class="loading-container">
+  <img src="assets/loading.gif" alt="Loading..." />
+</div>
 <div *ngIf="error$ | async as error">{{ error }}</div>
 <div class="task-actions">
   <button class="add-task-button" (click)="openTaskModal()">Add Task</button>
