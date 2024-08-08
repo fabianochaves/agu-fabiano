@@ -8,14 +8,12 @@
     <label for="password">Senha:</label>
     <input type="password" id="password" [(ngModel)]="password" name="password" required (focus)="clearError()">
 
-    <button type="submit" [disabled]="isLoading">
+    <button type="submit" [disabled]="isLoading" class="button-login">
       <span *ngIf="isLoading">Carregando...</span>
       <span *ngIf="!isLoading">Login</span>
     </button>
-  </form>
 
-  <!-- Mostrar mensagem de erro -->
-  <div *ngIf="showError && (error$ | async) as errorMessage" class="error-message">
-    {{ errorMessage }}
-  </div>
+    <a (click)="openRegisterModal()">Registre-se</a>
+  
+  </form>
 </div>

@@ -69,6 +69,7 @@ class AuthController extends AbstractController
         }
 
         $success = $this->userService->register($registerDTO);
+        
         if (!$success) {
             return new JsonResponse(['error' => 'Username already exists'], Response::HTTP_CONFLICT);
         }

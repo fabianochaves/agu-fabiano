@@ -102,8 +102,6 @@ export class TaskListComponent implements OnInit {
     });
   }
   
-
-
   openDeleteConfirmation(taskId: number) {
 
     this.taskDeleted = false;

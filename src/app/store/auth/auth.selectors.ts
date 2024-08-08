@@ -9,6 +9,11 @@ export const selectAuthToken = createSelector(
   (state: AuthState) => state.token
 );
 
+export const selectAuthLoading = createSelector(
+  selectAuthState,
+  (state: AuthState) => state.loading // Ajuste a propriedade conforme o nome do estado de carregamento
+);
+
 export const selectAuthError = createSelector(
   selectAuthState,
   (state: AuthState) => state.error

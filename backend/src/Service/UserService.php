@@ -24,6 +24,7 @@ class UserService
     public function register(RegisterDTO $registerDTO): bool
     {
         $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $registerDTO->getUsername()]);
+        
         if ($existingUser) {
             return false;
         }
