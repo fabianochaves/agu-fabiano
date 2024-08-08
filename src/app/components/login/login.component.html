@@ -1,7 +1,7 @@
 <!-- src/app/components/login/login.component.html -->
-<div>
+<div class="login-container">
   <h2>Login</h2>
-  <form (ngSubmit)="login()">
+  <form (ngSubmit)="login()" class="login-form">
     <label for="username">Usuário:</label>
     <input type="text" id="username" [(ngModel)]="username" name="username" required (focus)="clearError()">
 

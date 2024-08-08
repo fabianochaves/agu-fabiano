@@ -1,0 +1,35 @@
+/* src/styles.scss or src/app/app.component.scss */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #e0e0e0; /* Cinza claro */
+  }
+  
+  .main {
+
+    background-color: #e0e0e0; /* Cinza claro para o fundo da área principal */
+  }
+  
+  .content {
+    flex: 1;
+    padding: 13px;
+    text-align: center;
+    background-color: #e0e0e0; /* Cor cinza claro */
+  }
+  
+  h1 {
+    color: #333;
+  }
+  
+  p {
+    color: #555;
+  }
+  
+  footer {
+    background-color: #ccc; /* Cor do fundo do footer */
+    padding: 10px;
+    text-align: center;
+  }
+  

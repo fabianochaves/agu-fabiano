@@ -36,4 +36,14 @@ export class TaskService {
     });
   }
 
+  updateTask(id: number, title: string, description: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    return this.http.put<any>(`${this.apiUrl}/${id}`, { title, description }, {
+      headers: new HttpHeaders({
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      })
+    });
+  }
+
 }

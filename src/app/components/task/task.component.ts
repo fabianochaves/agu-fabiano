@@ -3,7 +3,6 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 import { TaskState } from '../../store/tasks/task.reducer';
-import { deleteTask } from '../../store/tasks/task.actions';
 import {FormsModule} from "@angular/forms";
 
 @Component({
@@ -21,10 +20,10 @@ export class TaskComponent {
   error$: Observable<string | null>;
 
   constructor(private store: Store<TaskState>) {
-    // Seleciona os estados do NgRx store
     this.tasks$ = this.store.select(state => state.tasks);
     this.loading$ = this.store.select(state => state.loading);
     this.error$ = this.store.select(state => state.error);
+    
   }
   
 }
