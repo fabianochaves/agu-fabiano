@@ -29,13 +29,13 @@ COPY . .
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Configuração do Composer para permitir o plugin symfony/runtime
-#RUN composer config --no-plugins allow-plugins.symfony/runtime true
+RUN composer config --no-plugins allow-plugins.symfony/runtime true
 
 # Instala as dependências do Composer
-#RUN composer install --no-interaction --optimize-autoloader
+RUN composer install --no-interaction --optimize-autoloader
 
 # Configurar o PATH para incluir o Symfony CLI
-#ENV PATH="/root/.symfony5/bin:${PATH}"
+ENV PATH="/root/.symfony5/bin:${PATH}"
 
 # Comando padrão para iniciar o container
 CMD ["php-fpm"]

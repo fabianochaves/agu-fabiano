@@ -1,69 +1,35 @@
-# Requisitos para Teste Técnico de Desenvolvedor AGU
-## Descrição do Projeto
-Você será responsável por desenvolver uma aplicação simples de gerenciamento de tarefas (To-Do List) que permita ao usuário adicionar, editar, remover e listar tarefas. A aplicação deverá ser desenvolvida utilizando a stack especificada. A interface deve ser intuitiva e responsiva. A comunicação entre o frontend e o backend deve ser realizada via REST API.
-Este teste pode ser melhorado, porém é necessário que seja respeitado as tecnologias listas.
+Projeto de Cadastro de Tarefas, utilizando Angular 17 no Front-End e PHP Symfony 6 no Back-End
 
-## Requisitos Funcionais
-### Autenticação:
+Informações
+- Utilizado os conceitos de NGRX para gerenciamento de estados no Front-End.
+- Utilizado os conceitos de DTO eService no Back-End.
+- Autenticação via JWT.
+- Utilizado o Docker para o Back-End.
 
-O usuário deve ser capaz de se autenticar utilizando JWT.
-A autenticação deve ser implementada no backend com PHP e Symfony.
+Instruções de Instalação:
 
-### Gerenciamento de Tarefas:
+1) Tenha instalado o Docker em sua máquina
+2) Clone o repositório para uma pasta de sua preferência.
+3) Na pasta raiz, rode o comando docker-compose up -d, que irá instalar:
 
-- Adicionar uma nova tarefa.
-- Editar uma tarefa existente.
-- Remover uma tarefa.
-- Listar todas as tarefas.
-As tarefas devem ser armazenadas em um banco de dados MySQL.
+    a) Container do Back-End.
+    b) NGINX
+    c) MySQL
+    d) PHP 8.1
+    e) Composer
+    f) Symfony e Symfony CLI
+    g) Banco de Dados (dbtasks) gerado automaticamente pelo docker-compose, buscando o arquivo database/task_app_ddl.sql
 
-### Interface de Usuário:
+    OBS: os arquivos docker-compose.yml e Dockerfile contém as configurações de instalação do back-end.
 
-- Desenvolver a interface em Angular 17.
-- Utilizar Angular Material ou PrimeNG para componentes UI.
-- Implementar formulários reativos com Angular Forms.
-- Utilizar NgRx para gerenciamento de estado.
-- Requisitos Não Funcionais
+4) Crie o arquivo .env em /backend conforme o env.example.
+5) Gere o APP_SECRET via comando do symfony (symfony console secrets:generate)
+6) Gere as chaves JWT pública e privada e guarde-as na pasta backend/config/jwt (private.pem e public.pem)
+7) Se tiver alguma intercorrência com dependências do composer, navegue até a pasta backend e rode o comando composer install
+8) Na pasta raiz, rode o comando npm install, para instalar as dependências do front-end (Angular, Node e etc).
+9) Em localhost:4200 é possível acessar o front-end após instalado as dependências.
+10) Com os containers ativos e o front-end acessivel, já é possível utilizar a aplicação, sendo que a base estará limpa, então na tela inicial, deve começar registrando um novo usuário.
 
-## Tecnologias Utilizadas
-### Frontend:
+Observações:
 
-- Angular 17
-- Rxjs ou Ngrx ou Signals
-- TypeScript 5.4/5.5
-- SASS
-- HTML 5.2
-- CSS 2.1
-- JWT
-- WebSocket/SSE (opcional)
-
---- 
-
-
-# Frontend
-
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.8.
-
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- No arquivo backend\src\EventListener\CorsListener.php contém a configuração de que as requisições ao backend só são aceitas da origem localhost:4200
