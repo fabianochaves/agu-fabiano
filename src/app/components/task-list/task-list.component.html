@@ -1,0 +1,33 @@
+<div *ngIf="loading$ | async" class="loading-container">
+  <img src="assets/loading.gif" alt="Loading..." />
+</div>
+<div *ngIf="error$ | async as error">{{ error }}</div>
+<div class="task-actions">
+  <button class="add-task-button" (click)="openTaskModal()">Add Task</button>
+</div>
+
+<div class="spacer"></div>
+
+<div class="table-container">
+  <table *ngIf="!(loading$ | async)">
+    <thead>
+      <tr>
+        <th>Actions</th>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let task of tasks$ | async">
+        <td>
+          <button class="delete-task-button" (click)="openDeleteConfirmation(task.id)">Delete</button>
+          <button class="edit-task-button" (click)="openTaskModal(task)">Edit</button>
+        </td>
+        <td>{{ task.id }}</td>
+        <td>{{ task.title }}</td>
+        <td>{{ task.description }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

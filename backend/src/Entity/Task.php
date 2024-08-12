@@ -7,6 +7,7 @@ use App\Entity\User;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TaskRepository")
+ * @ORM\Table(name="tasks")
  */
 class Task
 {
@@ -76,6 +77,20 @@ class Task
     {
         $this->description = $description;
         $this->updated_at = new \DateTime();
+
+        return $this;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->created_at = $createdAt;
+
+        return $this;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->updated_at = $createdAt;
 
         return $this;
     }

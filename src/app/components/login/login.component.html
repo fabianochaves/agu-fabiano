@@ -1,0 +1,19 @@
+<!-- src/app/components/login/login.component.html -->
+<div class="login-container">
+  <h2>Login</h2>
+  <form (ngSubmit)="login()" class="login-form">
+    <label for="username">Usuário:</label>
+    <input type="text" id="username" [(ngModel)]="username" name="username" required (focus)="clearError()">
+
+    <label for="password">Senha:</label>
+    <input type="password" id="password" [(ngModel)]="password" name="password" required (focus)="clearError()">
+
+    <button type="submit" [disabled]="isLoading" class="button-login">
+      <span *ngIf="isLoading">Carregando...</span>
+      <span *ngIf="!isLoading">Login</span>
+    </button>
+
+    <a (click)="openRegisterModal()">Registre-se</a>
+  
+  </form>
+</div>

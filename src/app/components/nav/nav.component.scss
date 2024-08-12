@@ -1,0 +1,20 @@
+/* src/app/components/nav/nav.component.scss */
+nav {
+    display: flex; /* Use flexbox para melhor controle do layout */
+    gap: 10px; /* Adiciona espaçamento entre os itens */
+    padding: 10px; /* Opcional: Adiciona padding ao redor do nav */
+    background-color: #f4f4f4; /* Opcional: Adiciona uma cor de fundo */
+  }
+  
+  nav a {
+    cursor: pointer; /* Garante que o cursor se torna uma mãozinha */
+    text-decoration: none; /* Remove o sublinhado dos links */
+    color: #007bff; /* Define a cor do link */
+    padding: 5px 10px; /* Adiciona padding para melhor aparência */
+  }
+  
+  nav a:hover {
+    text-decoration: underline; /* Adiciona um sublinhado ao passar o mouse */
+    color: #0056b3; /* Define a cor do link ao passar o mouse */
+  }
+  
