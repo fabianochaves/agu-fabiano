@@ -12,13 +12,13 @@ Instruções de Instalação:
 2) Clone o repositório para uma pasta de sua preferência.
 3) Na pasta raiz, rode o comando docker-compose up -d, que irá instalar:
 
-    a) Container do Back-End.
-    b) NGINX
-    c) MySQL
-    d) PHP 8.1
-    e) Composer
-    f) Symfony e Symfony CLI
-    g) Banco de Dados (dbtasks) gerado automaticamente pelo docker-compose, buscando o arquivo database/task_app_ddl.sql
+    - Container do Back-End.
+    - NGINX
+    - MySQL
+    - PHP 8.1
+    - Composer
+    - Symfony e Symfony CLI
+    - Banco de Dados (dbtasks) gerado automaticamente pelo docker-compose, buscando o arquivo database/task_app_ddl.sql
 
     OBS: os arquivos docker-compose.yml e Dockerfile contém as configurações de instalação do back-end.
 
